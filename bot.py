@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands, tasks
 import aiohttp
 from dotenv import load_dotenv
-# from database import init_db_pool, close_db_pool
+from database import init_db_pool, close_db_pool
 import asyncio
 import logging
 import datetime as _datetime
@@ -160,16 +160,15 @@ async def send_metrics_to_backend():
 # Evento de inicio del bot
 @bot.event
 async def setup_hook():
-    # logging.info('Iniciando conexión a la base de datos...')
-    # await init_db_pool()
-    # logging.info('Conexión a la base de datos establecida.')
-    # logging.info('Sincronizando comandos...')
-    # await bot.load_extension('cogs.asistencia')
-    # await bot.load_extension('cogs.faltas')
-    # await bot.load_extension('cogs.recuperacion')
-    # await bot.tree.sync()
-    # logging.info('Comandos sincronizados.')
-    # Nota: Los cogs ahora están organizados en carpetas (asistencia/, faltas/, recuperacion/)
+    logging.info('Iniciando conexión a la base de datos...')
+    await init_db_pool()
+    logging.info('Conexión a la base de datos establecida.')
+    logging.info('Sincronizando comandos...')
+    await bot.load_extension('cogs.asistencia')
+    await bot.load_extension('cogs.faltas')
+    await bot.load_extension('cogs.recuperacion')
+    await bot.tree.sync()
+    logging.info('Comandos sincronizados.')
     logging.info('Iniciando tarea de envío de métricas...')
     send_metrics_to_backend.start()
     logging.info(f'Bot conectado como {bot.user}')
@@ -190,8 +189,8 @@ async def main():
             send_metrics_to_backend.cancel()
         await update_bot_status("offline")
         await asyncio.sleep(1)
-        # await close_db_pool()
-        # logging.info("Conexión a la base de datos cerrada.")
+        await close_db_pool()
+        logging.info("Conexión a la base de datos cerrada.")
         await bot.close()
 
 if __name__ == "__main__":
